@@ -7,7 +7,7 @@ import aiomysql
 def log(sql, args=()):
     logging.info('SQL: %s' % sql)
 
-async def create_pool(loop, **kw):
+async def create_pool(**kw):
     logging.info('create database connection pool...')
     global __pool
     __pool = await aiomysql.create_pool(
@@ -20,7 +20,7 @@ async def create_pool(loop, **kw):
         autocommit = kw.get('autocommit', True),
         maxsize = kw.get('maxsize', 10),
         minsize = kw.get('minsize', 1),
-        loop = loop
+        #loop = loop
     )
 
 async def select(sql, args, size=None):
@@ -104,7 +104,6 @@ class ModelMetaclass(type):
         for k, v in attrs.items():
             if isinstance(v, Field):
                 logging.info('    found mapping: %s ==> %s' % (k, v))
-                print('    found mapping: %s ==> %s' % (k, v))
                 mappings[k] = v
                 if v.primary_key:
                     if primaryKey: # 找到主键:
@@ -188,8 +187,8 @@ class Model(dict, metaclass = ModelMetaclass):
                 args.extend(limit)
             else:
                 raise ValueError('Invalid limit value: %s ' % str(limit))
-            rs = await select(' '.join(sql), args)
-            return [cls(**r) for r in rs]
+        rs = await select(' '.join(sql), args)
+        return [cls(**r) for r in rs]
 
     @classmethod
     async def findNumber(cls, selectField, where = None, args = None):

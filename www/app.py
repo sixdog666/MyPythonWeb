@@ -5,7 +5,7 @@ async web application.
 '''
 
 import logging; logging.basicConfig(level=logging.INFO)
-
+logging.basicConfig(level=logging.INFO)
 import asyncio, os, json, time
 import orm 
 from datetime import datetime
@@ -36,9 +36,7 @@ def init_jinja2(app, **kw):
     app['__templating__'] = env
 
 async def logger_factory(app, handler):
-    print('4444444')
     async def logger(request):
-        print('5555555')
         logging.info('Request: %s %s' % (request.method, request.path))
         #await asyncio.sleep(0.3)
         return (await handler(request))
@@ -57,7 +55,6 @@ async def data_factory(app, handler):
     return parse_data
 
 async def response_factory(app, handler):
-    print('1111111111111')
     async def response(request):
         logging.info('Response handler ...')
         r = await handler(request)
@@ -79,7 +76,7 @@ async def response_factory(app, handler):
                 resp = web.Response(body = json.dumps(r, ensure_ascii=False, default=lambda o:o.__dict__).encode('utf-8'))
                 resp.content_type = 'application/json;charset=utf-8'
             else:
-                resp = web.Response(body=app['__templating__'].get_template.render(**r).encode('utf-8'))
+                resp = web.Response(body=app['__templating__'].get_template(template).render(**r).encode('utf-8'))
                 resp.content_type = 'text/html;charset=utf-8'
                 return resp
         if isinstance(r, int) and r >= 100 and r < 600:
@@ -108,18 +105,16 @@ def datetime_filter(t):
     return u'%s年%s月%s日' % (dt.year, dt.month, dt.day)
 
 
-async def init(loop):
-    await orm.create_pool(loop = loop, **configs['db'])
-    app = web.Application(loop = loop, middlewares = [
+async def init():
+    await orm.create_pool(**configs['db'])
+    app = web.Application(middlewares = [
         logger_factory, response_factory
     ])
     init_jinja2(app, filter = dict(datetime = datetime_filter))
     add_routes(app, 'handlers')
     add_static(app)
-    srv = await loop.create_server(app.make_handler(), '127.0.0.1', 9000)
-    logging.info('server started at http://127.0.0.1:9000...')
-    return srv
+    return app
 
-loop = asyncio.get_event_loop()
-loop.run_until_complete(init(loop))
-loop.run_forever()
+if __name__ == '__main__':
+     logging.info('server started at http://127.0.0.1:9000...')
+     web.run_app(init(), host = '127.0.0.1', port = 9000)

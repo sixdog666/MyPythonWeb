@@ -135,8 +135,10 @@ class RequestHandler(object):
         logging.info('call with args: %s' % str(kw))
         try:
             r = await self._func(**kw)
+            print('aaaaaa', r)
             return r
         except APIError as e:
+            print('tttttttttttt',e.error, e.data, e.message)
             return dict(error = e.error, data = e.data, message = e.message)
 
 def add_static(app):

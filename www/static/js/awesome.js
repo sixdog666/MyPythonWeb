@@ -1,70 +1,87 @@
-// swesome.js
-// patch for lowe-version IE:
-if(!window.console){
+// awesome.js
+
+// patch for lower-version IE:
+
+if (! window.console) {
     window.console = {
         log: function() {},
         info: function() {},
-        error: function() {},
-        warn: function() {},
-        debug: function() {}
+        error: function () {},
+        warn: function () {},
+        debug: function () {}
     };
 }
 
-//patch for string.trim():
+// patch for string.trim():
 
-if(! String.prototype.trim){
-    String.prototype.trim = function(){
-        return this.replace(/^\s|\s+$/g, '');
+if (! String.prototype.trim) {
+    String.prototype.trim = function() {
+        return this.replace(/^\s+|\s+$/g, '');
     };
 }
 
-if (! Number.prototype.toDateTime){
+if (! Number.prototype.toDateTime) {
     var replaces = {
-        'yyyy': function(dt){
+        'yyyy': function(dt) {
             return dt.getFullYear().toString();
         },
-        'yy': function(dt){
+        'yy': function(dt) {
             return (dt.getFullYear() % 100).toString();
         },
-        'MM': function(dt){
+        'MM': function(dt) {
             var m = dt.getMonth() + 1;
             return m < 10 ? '0' + m : m.toString();
         },
-        'M': function(dt){
+        'M': function(dt) {
             var m = dt.getMonth() + 1;
             return m.toString();
         },
-        'dd': function(dt){
+        'dd': function(dt) {
+            var d = dt.getDate();
+            return d < 10 ? '0' + d : d.toString();
+        },
+        'd': function(dt) {
             var d = dt.getDate();
             return d.toString();
         },
-        'hh': function(dt){
+        'hh': function(dt) {
+            var h = dt.getHours();
+            return h < 10 ? '0' + h : h.toString();
+        },
+        'h': function(dt) {
             var h = dt.getHours();
             return h.toString();
         },
-        'mm': function(dt){
-            var m = dt.getMinutes()
+        'mm': function(dt) {
+            var m = dt.getMinutes();
             return m < 10 ? '0' + m : m.toString();
         },
-        'm': function(dt){
+        'm': function(dt) {
             var m = dt.getMinutes();
-            return screen.toString();
+            return m.toString();
         },
-        'a': function(dt){
+        'ss': function(dt) {
+            var s = dt.getSeconds();
+            return s < 10 ? '0' + s : s.toString();
+        },
+        's': function(dt) {
+            var s = dt.getSeconds();
+            return s.toString();
+        },
+        'a': function(dt) {
             var h = dt.getHours();
-            return h < 12 ?'AM': 'PM'; 
+            return h < 12 ? 'AM' : 'PM';
         }
-
     };
     var token = /([a-zA-Z]+)/;
-    Number.prototype.toDateTime = function(format){
-        var fmt = format || 'yyyy-MM-dd hh:mm:ss';
+    Number.prototype.toDateTime = function(format) {
+        var fmt = format || 'yyyy-MM-dd hh:mm:ss'
         var dt = new Date(this * 1000);
         var arr = fmt.split(token);
-        for (var i = 0; i < arr.length; i++){
+        for (var i=0; i<arr.length; i++) {
             var s = arr[i];
-            if (s&&s in replaces){
-                arr[i] = replace[s](dt);
+            if (s && s in replaces) {
+                arr[i] = replaces[s](dt);
             }
         }
         return arr.join('');
@@ -75,165 +92,166 @@ function encodeHtml(str) {
     return String(str)
         .replace(/&/g, '&amp;')
         .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39')
+        .replace(/'/g, '&#39;')
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;');
-    
 }
-//parse query string as object:
 
-function parseQueryString(){
+// parse query string as object:
+
+function parseQueryString() {
     var
-       q = location.search,
-       r = {},
-       i, pos, s, qs;
-    if (q && q.charAt(0) === '?'){
+        q = location.search,
+        r = {},
+        i, pos, s, qs;
+    if (q && q.charAt(0)==='?') {
         qs = q.substring(1).split('&');
-        for (i = 0; i < qs.length; i++){
+        for (i=0; i<qs.length; i++) {
             s = qs[i];
             pos = s.indexOf('=');
-            if (pos <= 0){
+            if (pos <= 0) {
                 continue;
             }
-            r[s.substring(0, pos)] = decodeURIComponent(s.substring(pos+1)).replace(/\+/g, '');
+            r[s.substring(0, pos)] = decodeURIComponent(s.substring(pos+1)).replace(/\+/g, ' ');
         }
-
     }
     return r;
 }
 
-function gotoPage(i){
+function gotoPage(i) {
     var r = parseQueryString();
     r.page = i;
-    location.assign('?' + $.paramr(r));
+    location.assign('?' + $.param(r));
 }
 
-function refresh(){
+function refresh() {
     var
         t = new Date().getTime(),
         url = location.pathname;
-    if (location.search){
+    if (location.search) {
         url = url + location.search + '&t=' + t;
     }
-    else{
+    else {
         url = url + '?t=' + t;
     }
     location.assign(url);
 }
 
-function toSmartDate(timestamp){
-    if(typeof(timestamp)==='string'){
+function toSmartDate(timestamp) {
+    if (typeof(timestamp)==='string') {
         timestamp = parseInt(timestamp);
     }
-    if(isNaN(timestamp)){
+    if (isNaN(timestamp)) {
         return '';
     }
+
     var
         today = new Date(g_time),
         now = today.getTime(),
-        s = '1分钟前',
+        s = '1分钟前',
         t = now - timestamp;
-    if(t > 604800000){
-        //1 week ago:
+    if (t > 604800000) {
+        // 1 week ago:
         var that = new Date(timestamp);
-        var 
+        var
             y = that.getFullYear(),
             m = that.getMonth() + 1,
             d = that.getDate(),
             hh = that.getHours(),
             mm = that.getMinutes();
-        s = y === today.getFullYear() ? '': y + '年';
-        s = s + m + '月' + d + '日' + hh + ':' + (mm <10 ? '0':'') +mm;
+        s = y===today.getFullYear() ? '' : y + '年';
+        s = s + m + '月' + d + '日' + hh + ':' + (mm < 10 ? '0' : '') + mm;
     }
-    else if(t >= 86400000){
+    else if (t >= 86400000) {
         // 1-6 days ago:
-        s = Math.floor(t / 8640000) + '天前';
+        s = Math.floor(t / 86400000) + '天前';
     }
-    else if(t >= 3600000){
-        //1-23 hours ago:
+    else if (t >= 3600000) {
+        // 1-23 hours ago:
         s = Math.floor(t / 3600000) + '小时前';
     }
-    else if(t >= 60000){
+    else if (t >= 60000) {
         s = Math.floor(t / 60000) + '分钟前';
     }
     return s;
 }
 
-$(function(){
-    $('.x-smartdate').each(function(){
+
+
+$(function() {
+    $('.x-smartdate').each(function() {
         $(this).removeClass('x-smartdate').text(toSmartDate($(this).attr('date')));
     });
 });
 
-// JS Template
+// JS Template:
 
-function Template(tpl){
+function Template(tpl) {
     var
         fn,
         match,
-        code = ['var r=[];\nvar _html = function(str){return str.replace(/&/g, \'&amp;\').replace(/"/g, \'&quot;\').replace(/\'/g, \'&#39;\').replace(/</g, \'&lt;\').replace(/>/g, \'&gt;\'); };'],
+        code = ['var r=[];\nvar _html = function (str) { return str.replace(/&/g, \'&amp;\').replace(/"/g, \'&quot;\').replace(/\'/g, \'&#39;\').replace(/</g, \'&lt;\').replace(/>/g, \'&gt;\'); };'],
         re = /\{\s*([a-zA-Z\.\_0-9()]+)(\s*\|\s*safe)?\s*\}/m,
-        addLine = function(text){
-            code.push('r.push(\' ' + text.replace(/\'/g, '\\\'').replace(/\n/g, '\\n').replace(/\r/g, '\\r') + '\');');
+        addLine = function (text) {
+            code.push('r.push(\'' + text.replace(/\'/g, '\\\'').replace(/\n/g, '\\n').replace(/\r/g, '\\r') + '\');');
         };
-    while(match = re.exec(tpl)){
-        if(match.index > 0){
+    while (match = re.exec(tpl)) {
+        if (match.index > 0) {
             addLine(tpl.slice(0, match.index));
         }
-        if(match[2]){
-            code.push('r.push(String(this.' + match[1]+ '));');
+        if (match[2]) {
+            code.push('r.push(String(this.' + match[1] + '));');
         }
-        else{
-            code.push('r,push(_html(String(this.' + match[1] + ')))');
+        else {
+            code.push('r.push(_html(String(this.' + match[1] + ')));');
         }
         tpl = tpl.substring(match.index + match[0].length);
     }
     addLine(tpl);
     code.push('return r.join(\'\');');
     fn = new Function(code.join('\n'));
-    this.render = function(model) {
+    this.render = function (model) {
         return fn.apply(model);
     };
-
 }
 
-//extends jQuery.form:
-$(function(){
+// extends jQuery.form:
+
+$(function () {
     console.log('Extends $form...');
     $.fn.extend({
-        showFormError: function(err){
-            return this.each(function(){
+        showFormError: function (err) {
+            return this.each(function () {
                 var
                     $form = $(this),
-                    $alert = $form.find('.uk-alert-danger'),
+                    $alert = $form && $form.find('.uk-alert-danger'),
                     fieldName = err && err.data;
-                    if(! $form.is('form')){
-                        console.error('Cannnot call showFormError() on non-form object.');
-                        return;
+                if (! $form.is('form')) {
+                    console.error('Cannot call showFormError() on non-form object.');
+                    return;
+                }
+                $form.find('input').removeClass('uk-form-danger');
+                $form.find('select').removeClass('uk-form-danger');
+                $form.find('textarea').removeClass('uk-form-danger');
+                if ($alert.length === 0) {
+                    console.warn('Cannot find .uk-alert-danger element.');
+                    return;
+                }
+                if (err) {
+                    $alert.text(err.message ? err.message : (err.error ? err.error : err)).removeClass('uk-hidden').show();
+                    if (($alert.offset().top - 60) < $(window).scrollTop()) {
+                        $('html,body').animate({ scrollTop: $alert.offset().top - 60 });
                     }
-                    $form.find('input').removeClass('uk-form-danger');
-                    $form.find('select').removeClass('uk-form-danger');
-                    $form.find('textarea').removeClass('uk-form-danger'); 
-                    if($alert.length === 0){
-                        console.warn('Cannot find .uk-alert-danger element.');
-                        return;
+                    if (fieldName) {
+                        $form.find('[name=' + fieldName + ']').addClass('uk-form-danger');
                     }
-                    if(err){
-                        $alert.text(err.message ? err.message:(err.error ? err.error : err)).removeClass('uk-hidden').show();
-                        if(($alert.offset().top - 60) < $(window).scrollTop()){
-                            $('html,body').animate({ scrollTop: $alert.offset().top - 60});
-                        }
-                        if(fieldName){
-                            $form.find('[name='+ fieldName + ']').addClass('uk-form-danger');
-                        }
-                    }
-                    else{
-                        $alert.addClass('uk-hidden').hide();
-                        $form.find('.uk-form-danger').removeClass('uk-form-danger');
-                    }
+                }
+                else {
+                    $alert.addClass('uk-hidden').hide();
+                    $form.find('.uk-form-danger').removeClass('uk-form-danger');
+                }
             });
         },
-
         showFormLoading: function (isLoading) {
             return this.each(function () {
                 var

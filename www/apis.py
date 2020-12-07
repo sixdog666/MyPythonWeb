@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-
+__author__ = 'Michael Liao'
 
 '''
 JSON API definition.
@@ -13,10 +13,11 @@ class Page(object):
     '''
     Page object for display pages.
     '''
-    
-    def __init__(self, item_count, page_index = 1, page_size = 10):
+
+    def __init__(self, item_count, page_index=1, page_size=10):
         '''
         Init Pagination by item_count, page_index and page_size.
+
         >>> p1 = Page(100, 1)
         >>> p1.page_count
         10
@@ -52,11 +53,11 @@ class Page(object):
             self.limit = self.page_size
         self.has_next = self.page_index < self.page_count
         self.has_previous = self.page_index > 1
+
     def __str__(self):
         return 'item_count: %s, page_count: %s, page_index: %s, page_size: %s, offset: %s, limit: %s' % (self.item_count, self.page_count, self.page_index, self.page_size, self.offset, self.limit)
+
     __repr__ = __str__
-
-
 
 class APIError(Exception):
     '''
@@ -89,3 +90,7 @@ class APIPermissionError(APIError):
     '''
     def __init__(self, message=''):
         super(APIPermissionError, self).__init__('permission:forbidden', 'permission', message)
+
+if __name__=='__main__':
+    import doctest
+    doctest.testmod()

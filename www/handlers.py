@@ -18,7 +18,6 @@ from config import configs
 
 COOKIE_NAME = 'awesession'
 
-COOKIE_NAME = 'awesession'
 _COOKIE_KEY = configs['session']['secret']
 def check_admin(request):
     if request.__user__ is None or not request.__user__.admin:
@@ -87,7 +86,6 @@ async def index(request, *, page='1'):
     return{
         '__template__': 'blogs.html',
         'blogs': blogs,
-        #'__user__': request.__user__ ,
         'page' :page
     }
 
@@ -155,7 +153,6 @@ def manage_blogs( *, page='1'):
     return {
         '__template__': 'manage_blogs.html',
         'page_index': get_page_index(page)
-        #'__user__': request.__user__ 
     }
 
 @get('/manage/blogs/create')
@@ -163,7 +160,6 @@ def manage_create_blog():
     return {
         '__template__': 'manage_blog_edit.html',
         'id': '',
-        #'__user__': request.__user__ ,
         'action': '/api/blogs'
     }
 
@@ -171,7 +167,6 @@ def manage_create_blog():
 def manage_users( *, page='1'):
     return{
         '__template__': 'manage_users.html',
-        #'__user__': request.__user__ ,
         'page_index': get_page_index(page)
     }
 
